@@ -31,14 +31,18 @@ def tex_output(html_soup):
     result = ""
     for child in list(html_soup.children):
         tagname = child.name
+
         if tagname == None:
             result += latex_escape(unicode(child).encode("utf-8"))
         elif tagname == "p":
-            result += tex_output(child)
+            result += "\\paragraph{{}}\n{0}".format(tex_output(child))
         elif tagname == "em":
             result += "\\textit{{{0}}}".format(tex_output(child))
         elif tagname == "strong":
             result += "\\textbf{{{0}}}".format(tex_output(child))
+        elif tagname == "a":
+            src = child["href"]
+            result += "\\url{{{0}}}".format(latex_escape(src))
 
         elif tagname == "h1":
             # Here we assume there's only one level 1 title in the document!
