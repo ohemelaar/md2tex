@@ -1,9 +1,12 @@
 #!/usr/bin/python
 # coding: utf-8
 
+import hashlib
 import mistune
 import bs4
 from bs4 import BeautifulSoup
+import urllib
+import os.path
 
 input = open("input.md", "r")
 output = open("converted.tex", "w")
@@ -47,11 +50,23 @@ def tex_output(html_soup):
             result += "\\texttt{{{0}}}".format(tex_output(child))
         elif tagname == "pre":
             # A pre tag contains a code tag and no other formatting should occur to it, so we fetch it directly with no recursive call
-            # TODO make listings
-            result += "\\texttt{{{0}}}".format(child.find("code").string)
+            lstlisting_format = "\n\\begin{{lstlisting}}\n{0}\n\\end{{lstlisting}}\n"
+            result += lstlisting_format.format(child.find("code").string)
+
         elif tagname == "img":
-            # TODO implement images as figures
-            result += ""
+            src = child["src"]
+            # We use hases to make sure two images with the same name won't conflict
+            src_hash = hashlib.md5(src).hexdigest()
+            extension = src.split(".")[-1]
+            img_path = "img/" + src_hash + "." + extension
+            if not os.path.isfile(img_path):
+                urllib.urlretrieve(src, img_path)
+                print("An image had to be downloaded.")
+            else:
+                print("Image already esists, not downloading it again.")
+            alt = child["alt"]
+            image_format = "\n\\begin{{figure}}[h]\n\\centering\n\\includegraphics[width=0.7\\linewidth]{{{0}}}\n\\caption{{{1}}}\n\\end{{figure}}\n"
+            result += image_format.format(img_path, alt)
     return(result)
 
 output.write(tex_output(soup))
