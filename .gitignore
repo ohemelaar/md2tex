@@ -1,0 +1,5 @@
+*.jpg
+/output/
+*.toc
+*.aux
+*.log
