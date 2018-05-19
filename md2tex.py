@@ -32,7 +32,7 @@ def tex_output(html_soup):
     for child in list(html_soup.children):
         tagname = child.name
         if tagname == None:
-            result += latex_escape(unicode(child))
+            result += latex_escape(unicode(child).encode("utf-8"))
         elif tagname == "p":
             result += tex_output(child)
         elif tagname == "em":
@@ -42,7 +42,7 @@ def tex_output(html_soup):
 
         elif tagname == "h1":
             # Here we assume there's only one level 1 title in the document!
-            result += "\\part*{{{0}}}\\renewcommand{{\\contentsname}}{{Sommaire}}\\tableofcontents\\newpage\n".format(tex_output(child))
+            result += "\\part*{{{0}}}\n\\renewcommand{{\\contentsname}}{{Sommaire}}\\tableofcontents\\newpage\n".format(tex_output(child))
         elif tagname == "h2":
             result += "\\section{{{0}}}".format(tex_output(child))
         elif tagname == "h3":
@@ -72,14 +72,18 @@ def tex_output(html_soup):
             src_hash = hashlib.md5(src).hexdigest()
             extension = src.split(".")[-1]
             img_path = "img/" + src_hash + "." + extension
-            if not os.path.isfile(img_path):
-                urllib.urlretrieve(src, img_path)
-                print("An image had to be downloaded.")
+            try:
+                if not os.path.isfile(img_path):
+                    print("An image has to be downloaded.")
+                    urllib.urlretrieve(src, img_path)
+                else:
+                    print("Image already exists, not downloading it again.")
+            except IOError:
+                print("Downloading the image failed")
             else:
-                print("Image already esists, not downloading it again.")
-            alt = child["alt"]
-            image_format = "\n\\begin{{figure}}[h]\n\\centering\n\\includegraphics[width=0.7\\linewidth]{{{0}}}\n\\caption{{{1}}}\n\\end{{figure}}\n"
-            result += image_format.format(img_path, alt)
+                alt = child["alt"]
+                image_format = "\n\\begin{{figure}}[h]\n\\centering\n\\includegraphics[width=0.7\\linewidth]{{{0}}}\n\\caption{{{1}}}\n\\end{{figure}}\n"
+                result += image_format.format(img_path, alt)
     return(result)
 
 output.write(tex_output(soup))
