@@ -29,3 +29,6 @@ And here I will test numbered lists
 1. Rabit
     1. what
     1. okay
+
+Testing LaTeX special characters now.
+& % $ # _ { } ~ ^ \

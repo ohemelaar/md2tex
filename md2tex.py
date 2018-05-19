@@ -14,12 +14,25 @@ md = input.read()
 html = mistune.markdown(md)
 soup = BeautifulSoup(html, "html.parser")
 
+def latex_escape(text):
+    text = text.replace("\\", "\\textbackslash")
+    text = text.replace("&", "\\&")
+    text = text.replace("%", "\\%")
+    text = text.replace("$", "\\$")
+    text = text.replace("#", "\\#")
+    text = text.replace("_", "\\_")
+    text = text.replace("{", "\\{")
+    text = text.replace("}", "\\}")
+    text = text.replace("~", "\\textasciitilde")
+    text = text.replace("^", "\\textasciicircum")
+    return text
+
 def tex_output(html_soup):
     result = ""
     for child in list(html_soup.children):
         tagname = child.name
         if tagname == None:
-            result += unicode(child)
+            result += latex_escape(unicode(child))
         elif tagname == "p":
             result += tex_output(child)
         elif tagname == "em":
