@@ -68,7 +68,7 @@ def tex_output(html_soup):
         elif tagname == "pre":
             # A pre tag contains a code tag and no other formatting should occur to it, so we fetch it directly with no recursive call
             lstlisting_format = "\n\\begin{{lstlisting}}\n{0}\n\\end{{lstlisting}}\n"
-            result += lstlisting_format.format(child.find("code").string)
+            result += lstlisting_format.format(child.find("code").string.encode("utf-8"))
 
         elif tagname == "img":
             src = child["src"]
