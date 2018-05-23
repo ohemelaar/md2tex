@@ -86,7 +86,11 @@ def tex_output(html_soup):
                 print("Downloading the image failed")
             else:
                 alt = child["alt"]
-                image_format = "\n\\begin{{figure}}[h]\n\\centering\n\\includegraphics[width=0.7\\linewidth]{{{0}}}\n\\caption{{{1}}}\n\\end{{figure}}\n"
+                if alt.strip():
+                    alt = "\n\\caption{{{0}}}".format(alt)
+                else:
+                    alt_format = ""
+                image_format = "\n\\begin{{figure}}[h]\n\\centering\n\\includegraphics[width=0.7\\linewidth]{{{0}}}\n{1}\\end{{figure}}\n"
                 result += image_format.format(img_path, alt)
     return(result)
 
